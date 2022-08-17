@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/datajpa
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      # 데이터 삭제. 로컬에서만 사용.
+      ddl-auto: create
+    properties:
+      hibernate:
+        # 쿼리문이 정리되어서 나옴.
+        format_sql: true
+
+logging.level:
+  org.hibernate.SQL: debug
+  # 파라미터까지 볼 수 있는 옵션.
+  # org.hibernate.type: trace
