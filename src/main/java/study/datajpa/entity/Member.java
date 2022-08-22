@@ -21,7 +21,8 @@ public class Member {
     private int age;
 
     // 멤버랑 팀은 다대일 관계
-    @ManyToOne
+    // ManyTo는 fetch = FetchType.LAZY로 바꿔주기! (지연로딩으로 세팅, 즉시로딩은 성능최적화하기 어렵다.)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id") //FK명
     private Team team;
 // JPA에서는 protected로 기본생성자를 만들어줘야함. --> @NoArgsConstructor(access = AccessLevel.PROTECTED)로 밑에꺼 대신.
@@ -31,6 +32,14 @@ public class Member {
 
     public Member(String username) {
         this.username = username;
+    }
+
+    public Member(String username, int age, Team team) {
+        this.username = username;
+        this.age = age;
+        if(team != null){
+            changeTeam(team);
+        }
     }
 
     //멤버가 팀을 변경한다.
