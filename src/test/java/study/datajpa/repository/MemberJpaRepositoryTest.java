@@ -68,10 +68,4 @@ class MemberJpaRepositoryTest {
         Assertions.assertThat(deleteCount).isEqualTo(0);
 
     }
-
-
-
-
-
-
 }
