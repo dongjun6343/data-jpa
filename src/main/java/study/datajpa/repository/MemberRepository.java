@@ -1,6 +1,8 @@
 package study.datajpa.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import study.datajpa.entity.Member;
 
 import java.util.List;
@@ -11,4 +13,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     // 메소드이름으로 쿼리생성 -> 쿼리 메소드 기능
     List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
+
+    // 메소드이름으로 쿼리생성 단점 : 파라미터가 길어지면 메서드명이 너무 길어짐.
+    // 리포지토리 메소드에 쿼리 정의하기(실무에서 많이 쓰임.)
+    
+    // 정적쿼리. (리포지토리 메소드에 쿼리 정의)
+    // 동적쿼리. (QueryDSL)
+    @Query("select m from Member m where m.username = :username and m.age = :age")
+    List<Member> findUser(@Param("username") String usernamem, @Param("age") int age);
 }
