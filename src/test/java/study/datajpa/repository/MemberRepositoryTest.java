@@ -122,4 +122,18 @@ class MemberRepositoryTest {
             System.out.println("member = " + result);
         }
     }
+
+    @Test
+    public void returnType(){
+        Member m1 = new Member("AAA", 10);
+        Member m2 = new Member("BBB", 20);
+        memberRepository.save(m1);
+        memberRepository.save(m2);
+
+        List<Member> aaa = memberRepository.findListByUsername("AAA");
+        //만약 이름이 Unique하다면 리스트로 받을 필요없다
+        //Member findMember = memberRepository.findMemberByUsername("AAA");
+        // spring data jpa에서 null이면 try-catch문을 (NoResultException) 저절로 감싸줌. (논쟁거리)
+        // 하지만 java8부터는 Optional을 사용하면 된다.
+    }
 }
