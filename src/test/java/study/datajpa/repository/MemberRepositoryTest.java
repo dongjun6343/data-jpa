@@ -4,6 +4,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
@@ -135,5 +138,47 @@ class MemberRepositoryTest {
         //Member findMember = memberRepository.findMemberByUsername("AAA");
         // spring data jpa에서 null이면 try-catch문을 (NoResultException) 저절로 감싸줌. (논쟁거리)
         // 하지만 java8부터는 Optional을 사용하면 된다.
+    }
+
+    @Test
+    public void paging(){
+        // given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 10));
+        memberRepository.save(new Member("member3", 10));
+        memberRepository.save(new Member("member4", 10));
+        memberRepository.save(new Member("member5", 10));
+
+
+        int age = 10;
+        //스프링데이터JPA는 페이지를 1부터 시작하는게 아니라 0부터 시작한다!
+        // Sort 조건을 username에서 DESC할거다!
+        // ==> Sort.by(Sort.Direction.DESC,"username"
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+        // when
+        Page<Member> page = memberRepository.findByAge(age, pageRequest);
+
+        // API는 dto로 변환해서 사용해야함. why? entity를 반환했을때 api스펙이 달라지면 어떻게 할거냐?!
+        // map()을 사용하면 쉽게 변환할 수 있다.
+        // (중요!!)
+        Page<MemberDto> toMap = page.map(member -> new MemberDto(member.getId(), member.getUsername(), null));
+
+
+        // 반환타입이 Page면 알아서 totalCount 쿼리를 날린다.
+        // long totalCount = memberRepository.totalCount(age);
+
+        // then (검증)
+        List<Member> content = page.getContent();
+        long totalElements = page.getTotalElements();// totalCount와 동일.
+
+        Assertions.assertThat(content.size()).isEqualTo(3);
+        Assertions.assertThat(page.getTotalElements()).isEqualTo(5);
+        // page번호를 가져온다.
+        Assertions.assertThat(page.getNumber()).isEqualTo(0);
+        // 전체페이지 개수
+        Assertions.assertThat(page.getTotalPages()).isEqualTo(2);
+        Assertions.assertThat(page.isFirst()).isTrue();
+        Assertions.assertThat(page.hasNext()).isTrue();
     }
 }
