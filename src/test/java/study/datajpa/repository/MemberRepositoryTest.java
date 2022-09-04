@@ -13,6 +13,8 @@ import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 import study.datajpa.entity.Team;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class MemberRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired TeamRepository teamRepository;
+    @PersistenceContext EntityManager em;
 
     @Test
     public void testMember(){
@@ -180,5 +183,28 @@ class MemberRepositoryTest {
         Assertions.assertThat(page.getTotalPages()).isEqualTo(2);
         Assertions.assertThat(page.isFirst()).isTrue();
         Assertions.assertThat(page.hasNext()).isTrue();
+    }
+
+    @Test
+    public void bulkUpdate(){
+        //given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 19));
+        memberRepository.save(new Member("member3", 20));
+        memberRepository.save(new Member("member4", 21));
+        memberRepository.save(new Member("member5", 40));
+
+        //when
+        int resultCount = memberRepository.bulkAgePlus(20);
+        // 벌크성쿼리를 날리면 DB는 변경되지만 영속성컨텍스트는 모른다.
+        // ==> member5의 나이는 그대로 40임.
+        // 따라서 영속성컨텍스트를 날려준다.
+//        em.flush();
+//        em.clear();
+        // 또는 @Modifying(clearAutomatically = true) 사용.
+
+
+        //then
+        Assertions.assertThat(resultCount).isEqualTo(3);
     }
 }
