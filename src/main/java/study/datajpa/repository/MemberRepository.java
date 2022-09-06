@@ -2,6 +2,7 @@ package study.datajpa.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -53,4 +54,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
                                            // (clearAutomatically = true) : em.clear();
     @Query("update Member m set m.age = m.age + 1 where m.age >= :age")
     int bulkAgePlus(@Param("age") int age);
+
+    // team 객체까지 생성(proxy가 아니라 진짜 객체)
+    @Query("select m from Member m left join fetch m.team")
+    List<Member> findMemberFetchJoin();
+
+    @Override
+    @EntityGraph(attributePaths = {"team"}) // @EntityGraph == fetch join
+    List<Member> findAll();
 }
