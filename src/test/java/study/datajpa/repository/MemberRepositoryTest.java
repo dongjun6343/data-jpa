@@ -231,4 +231,34 @@ class MemberRepositoryTest {
             member.getTeam().getName();
         }
     }
+
+    @Test
+    public void queryHint(){
+        //given
+        Member member = new Member("member1", 10);
+        memberRepository.save(member);
+        em.flush();
+        em.clear();
+
+        //when
+        Member findMember = memberRepository.findReadOnlyByUsername("member1");
+        findMember.setUsername("member2");
+        // 원래는 변경감지가 되어서 update쿼리가 나가야하지만,
+        // 변경감지 체크를 하지 않는다.
+
+        em.flush();
+        //then
+    }
+
+    @Test
+    public void lock(){
+        //given
+        Member member = new Member("member1", 10);
+        memberRepository.save(member);
+        em.flush();
+        em.clear();
+
+        //when
+        List<Member> result = memberRepository.findLockByUsername("member1");
+    }
 }

@@ -2,14 +2,13 @@ package study.datajpa.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 
+import javax.persistence.LockModeType;
+import javax.persistence.QueryHint;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,5 +60,17 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Override
     @EntityGraph(attributePaths = {"team"}) // @EntityGraph == fetch join
+    // 간단할때는 EntityGraph 사용
+    // 복잡할때는 fetch join 사용.
     List<Member> findAll();
+
+    // 조회용으로만 쓸거야 ==> JPA Hint (성능 최적화)
+    // 하지만 생각보다 크게 차이가 안남. 성능 테스트를 해보고 진짜 필요하다라고 생각하면 그때 쓰자.
+    @QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
+    Member findReadOnlyByUsername(String username);
+
+
+    // selec for update
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    List<Member> findLockByUsername(String username);
 }
