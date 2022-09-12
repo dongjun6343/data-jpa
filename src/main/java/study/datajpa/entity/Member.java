@@ -10,7 +10,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 // 객체를 찍을때 출력.
 @ToString(of = {"id", "username", "age"})
-public class Member extends JpaBaseEntity{
+public class Member extends BaseEntity{
 
     @Id @GeneratedValue
     @Column(name = "member_id")
