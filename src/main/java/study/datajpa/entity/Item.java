@@ -1,0 +1,46 @@
+package study.datajpa.entity;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import javax.persistence.Entity;
+import javax.persistence.EntityListeners;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import java.time.LocalDateTime;
+
+@Entity
+@EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Item implements Persistable<String> {
+
+    //    @Id @GeneratedValue
+    //    private Long id;
+
+    // Id를 직접 임의로 생성해야할때 (채번 등등..) --> Persistable 사용
+    @Id
+    private String id;
+
+    @CreatedDate
+    private LocalDateTime createdDate;
+
+    public Item(String id){
+        this.id = id;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    @Override
+    public boolean isNew() {
+        // 로직을 짜줘야함.
+        return createdDate == null;
+    }
+}
